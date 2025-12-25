@@ -6,7 +6,6 @@ import CreatePost from '@/pages/(main)/CreatePost'
 import Profile from '@/pages/(main)/Profile'
 import Layout from '@/components/Layout'
 import ProtectedRoute from '@/components/ProtectedRoute'
-import { Sidebar, SidebarContent } from './components/ui/sidebar'
 
 function App() {
   return (
