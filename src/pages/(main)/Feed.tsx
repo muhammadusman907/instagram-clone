@@ -4,7 +4,7 @@ import type { Post } from '@/types'
 import { postsApi } from '@/lib/api'
 import { PostCard } from '@/components/PostCard'
 import { Skeleton } from '@/components/ui/skeleton'
-
+import STORYIMAGE from '@/assets/download (2).jpg'
 export default function Feed() {
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
@@ -15,7 +15,7 @@ export default function Feed() {
   const loadPosts = async (pageNum: number, reset = false) => {
     try {
       const newPosts = await postsApi.getPosts(postsPerPage, pageNum * postsPerPage)
-      
+
       if (reset) {
         setPosts(newPosts)
       } else {
@@ -33,14 +33,14 @@ export default function Feed() {
 
   useEffect(() => {
     loadPosts(0, true)
-    
+
     // Listen for comment changes to refresh posts
     const handleCommentChange = () => {
       loadPosts(0, true)
     }
     window.addEventListener('comment-added', handleCommentChange)
     window.addEventListener('comment-deleted', handleCommentChange)
-    
+
     return () => {
       window.removeEventListener('comment-added', handleCommentChange)
       window.removeEventListener('comment-deleted', handleCommentChange)
@@ -77,29 +77,42 @@ export default function Feed() {
   }
 
   return (
-    <InfiniteScroll
-      dataLength={posts.length}
-      next={fetchMorePosts}
-      hasMore={hasMore}
-      loader={
-        <div className="space-y-8 mt-8">
-          {[1, 2].map((i) => (
-            <PostSkeleton key={i} />
-          ))}
-        </div>
-      }
-      endMessage={
-        <div className="text-center py-8 text-muted-foreground">
-          <p>You've seen all posts!</p>
-        </div>
-      }
-    >
-      <div className="space-y-8">
-        {posts.map((post) => (
-          <PostCard key={post.id} post={post} onDelete={handlePostDelete} />
+    <>
+      <div className="flex gap-4 w-full overflow-x-auto py-2">
+        {/* Instagram-style gradient story rings. Replace `src` with real avatar URLs. */}
+        {Array.from({ length: 12 }).map((_, i) => (
+          <StoryAvatar key={i} />
         ))}
       </div>
-    </InfiniteScroll>
+        <div id="feed-scroll-container" className="h-auto lg:h-[500px] overflow-auto">
+          <InfiniteScroll
+            scrollableTarget="feed-scroll-container"
+            dataLength={posts.length}
+            next={fetchMorePosts}
+            hasMore={hasMore}
+            loader={
+              <div className="space-y-8 mt-8">
+                {[1, 2].map((i) => (
+                  <PostSkeleton key={i} />
+                ))}
+              </div>
+            }
+            endMessage={
+              <div className="text-center py-8 text-muted-foreground">
+                <p>You've seen all posts!</p>
+              </div>
+            }
+          >
+            <div className="">
+              {posts.map((post) => (
+                <PostCard key={post.id} post={post} onDelete={handlePostDelete} />
+              ))}
+            </div>
+          </InfiniteScroll>
+        </div>
+    </>
+
+
   )
 }
 
@@ -127,5 +140,25 @@ function PostSkeleton() {
         <Skeleton className="h-3 w-32" />
       </div>
     </article>
+  )
+}
+
+function StoryAvatar({ src }: { src?: string }) {
+  return (
+    <div className="w-12 h-12 p-[2px] rounded-full bg-gradient-to-tr from-[#feda75] via-[#d62976] to-[#962fbf]">
+      <div className="bg-white rounded-full w-full h-full overflow-hidden shadow-sm">
+        {src ? (
+          <img src={src} alt="story" className="w-full h-full object-cover" />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-xs font-medium text-muted-foreground">
+            <img
+              src={STORYIMAGE}
+              alt="default avatar"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
+      </div>
+    </div>
   )
 }

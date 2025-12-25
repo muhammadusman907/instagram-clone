@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import Login from '@/pages/(auth)/Login'
 import Signup from '@/pages/(auth)/Signup'
 import Feed from '@/pages/(main)/Feed'
@@ -6,11 +6,11 @@ import CreatePost from '@/pages/(main)/CreatePost'
 import Profile from '@/pages/(main)/Profile'
 import Layout from '@/components/Layout'
 import ProtectedRoute from '@/components/ProtectedRoute'
+import { Sidebar, SidebarContent } from './components/ui/sidebar'
 
 function App() {
   return (
-    <Router>
-      <Routes>
+    <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
@@ -49,8 +49,7 @@ function App() {
 
         {/* Redirect unknown routes to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Router>
+    </Routes>
   )
 }
 

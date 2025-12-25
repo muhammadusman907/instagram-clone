@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { formatDistanceToNow } from 'date-fns'
-import { Heart, MessageCircle, MoreVertical } from 'lucide-react'
+import { Heart, MessageCircle, MoreVertical, Bookmark } from 'lucide-react'
 import type { Post } from '@/types'
 import { useAuthStore } from '@/store/authStore'
 import { likesApi, postsApi } from '@/lib/api'
@@ -81,30 +81,52 @@ export function PostCard({ post, onDelete }: PostCardProps) {
 
   return (
     <>
-      <article className="mb-8 rounded-lg border bg-card shadow-sm">
+      <article className="bg-white border border-gray-200 rounded-lg overflow-hidden mb-6 max-w-[470px] w-full mx-auto shadow-md">
         {/* Header */}
-        <div className="flex items-center justify-between p-4">
-          <Link to={`/profile/${post.profile?.username}`} className="flex items-center space-x-3">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={post.profile?.avatar_url ?? undefined} alt={post.profile?.username} />
-              <AvatarFallback>{getInitials(post.profile?.full_name ?? post.profile?.username ?? null)}</AvatarFallback>
+        <div className="flex items-center justify-between px-3 py-2.5">
+          <Link
+            to={`/profile/${post.profile?.username}`}
+            className="flex items-center gap-3 flex-1 min-w-0"
+          >
+            <Avatar className="h-8 w-8 ring-2 ring-offset-1 ring-gray-100">
+              <AvatarImage
+                // src={post.profile?.avatar_url}
+                alt={post.profile?.username}
+              />
+              <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white text-xs font-semibold">
+                {getInitials(
+                  post.profile?.full_name ?? post.profile?.username ?? null
+                )}
+              </AvatarFallback>
             </Avatar>
-            <div>
-              <p className="font-semibold">{post.profile?.username}</p>
+            <div className="flex flex-col min-w-0">
+              <span className="font-semibold text-sm text-gray-900 hover:text-gray-600 transition-colors truncate">
+                {post.profile?.username}
+              </span>
               {post.profile?.full_name && (
-                <p className="text-sm text-muted-foreground">{post.profile.full_name}</p>
+                <span className="text-xs text-gray-500 truncate">
+                  {post.profile.full_name}
+                </span>
               )}
             </div>
           </Link>
+
           {isOwnPost && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-gray-700 hover:text-gray-900"
+                >
                   <MoreVertical className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={handleDelete} className="text-destructive cursor-pointer">
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem
+                  onClick={handleDelete}
+                  className="text-red-600 focus:text-red-600 font-semibold cursor-pointer"
+                >
                   Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -112,64 +134,96 @@ export function PostCard({ post, onDelete }: PostCardProps) {
           )}
         </div>
 
-        {/* Image */}
-        <div className="relative aspect-square w-full bg-muted">
+        {/* Image Container - Fixed aspect ratio like Instagram */}
+        <div className="relative w-full bg-black">
           <img
             src={post.image_url}
             alt={post.caption || 'Post image'}
-            className="h-full w-full object-cover"
+            className="w-full h-auto object-contain max-h-[585px]"
+            style={{ display: 'block' }}
           />
         </div>
 
-        {/* Actions */}
-        <div className="p-4 space-y-2">
-          <div className="flex items-center space-x-4">
+        {/* Actions Bar */}
+        <div className="px-3 pt-2 pb-1">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleLike}
+                disabled={!user || isLiking}
+                className={`h-9 w-9 hover:bg-transparent hover:scale-110 transition-transform ${
+                  isLiked ? 'text-red-500' : 'text-gray-900'
+                }`}
+              >
+                <Heart
+                  className={`h-6 w-6 ${isLiked ? 'fill-current' : ''}`}
+                />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowComments(true)}
+                disabled={!user}
+                className="h-9 w-9 hover:bg-transparent hover:scale-110 transition-transform text-gray-900"
+              >
+                <MessageCircle className="h-6 w-6" />
+              </Button>
+            </div>
             <Button
               variant="ghost"
               size="icon"
-              onClick={handleLike}
-              disabled={!user || isLiking}
-              className={isLiked ? 'text-red-500 hover:text-red-600' : ''}
+              className="h-9 w-9 hover:bg-transparent hover:scale-110 transition-transform text-gray-900"
             >
-              <Heart className={`h-6 w-6 ${isLiked ? 'fill-current' : ''}`} />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setShowComments(true)}
-              disabled={!user}
-            >
-              <MessageCircle className="h-6 w-6" />
+              <Bookmark className="h-6 w-6" />
             </Button>
           </div>
+        </div>
 
-          {/* Likes Count */}
-          {likesCount > 0 && (
-            <p className="font-semibold text-sm">{likesCount} {likesCount === 1 ? 'like' : 'likes'}</p>
-          )}
-
-          {/* Caption */}
-          <div className="text-sm">
-            <Link to={`/profile/${post.profile?.username}`} className="font-semibold mr-2">
-              {post.profile?.username}
-            </Link>
-            <span>{post.caption}</span>
-          </div>
-
-          {/* Comments Count */}
-          {post.comments_count !== undefined && post.comments_count > 0 && (
-            <button
-              onClick={() => setShowComments(true)}
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              View all {post.comments_count} {post.comments_count === 1 ? 'comment' : 'comments'}
+        {/* Likes Count */}
+        {likesCount > 0 && (
+          <div className="px-3 pb-2">
+            <button className="font-semibold text-sm text-gray-900 hover:text-gray-600">
+              {likesCount.toLocaleString()}{' '}
+              {likesCount === 1 ? 'like' : 'likes'}
             </button>
-          )}
+          </div>
+        )}
 
-          {/* Time */}
-          <p className="text-xs text-muted-foreground">
-            {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
-          </p>
+        {/* Caption */}
+        {post.caption && (
+          <div className="px-3 pb-2">
+            <div className="text-sm">
+              <Link
+                to={`/profile/${post.profile?.username}`}
+                className="font-semibold text-gray-900 hover:text-gray-600 mr-2"
+              >
+                {post.profile?.username}
+              </Link>
+              <span className="text-gray-900">{post.caption}</span>
+            </div>
+          </div>
+        )}
+
+        {/* View Comments */}
+        {post.comments_count !== undefined && post.comments_count > 0 && (
+          <button
+            onClick={() => setShowComments(true)}
+            className="px-3 pb-2 text-sm text-gray-500 hover:text-gray-700 w-full text-left"
+          >
+            View all {post.comments_count}{' '}
+            {post.comments_count === 1 ? 'comment' : 'comments'}
+          </button>
+        )}
+
+        {/* Timestamp */}
+        <div className="px-3 pb-3">
+          <time className="text-xs text-gray-500 uppercase">
+            {formatDistanceToNow(new Date(post.created_at), {
+              addSuffix: true,
+            })}
+          </time>
         </div>
       </article>
 
@@ -183,4 +237,3 @@ export function PostCard({ post, onDelete }: PostCardProps) {
     </>
   )
 }
-
