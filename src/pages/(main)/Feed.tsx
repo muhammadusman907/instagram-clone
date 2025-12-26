@@ -80,36 +80,36 @@ export default function Feed() {
     <>
       <div className="flex gap-4 w-full overflow-x-auto py-2">
         {/* Instagram-style gradient story rings. Replace `src` with real avatar URLs. */}
-        {Array.from({ length: 12 }).map((_, i) => (
+        <div className='flex justify-center w-full gap-3'>{Array.from({ length: 6 }).map((_, i) => (
           <StoryAvatar key={i} />
-        ))}
+        ))}</div>
       </div>
-        <div id="feed-scroll-container" className="h-auto lg:h-[500px] overflow-auto">
-          <InfiniteScroll
-            scrollableTarget="feed-scroll-container"
-            dataLength={posts.length}
-            next={fetchMorePosts}
-            hasMore={hasMore}
-            loader={
-              <div className="space-y-8 mt-8">
-                {[1, 2].map((i) => (
-                  <PostSkeleton key={i} />
-                ))}
-              </div>
-            }
-            endMessage={
-              <div className="text-center py-8 text-muted-foreground">
-                <p>You've seen all posts!</p>
-              </div>
-            }
-          >
-            <div className="">
-              {posts.map((post) => (
-                <PostCard key={post.id} post={post} onDelete={handlePostDelete} />
+      <div id="feed-scroll-container" className="h-auto lg:h-[500px] overflow-auto">
+        <InfiniteScroll
+          scrollableTarget="feed-scroll-container"
+          dataLength={posts.length}
+          next={fetchMorePosts}
+          hasMore={hasMore}
+          loader={
+            <div className="space-y-8 mt-8">
+              {[1, 2].map((i) => (
+                <PostSkeleton key={i} />
               ))}
             </div>
-          </InfiniteScroll>
-        </div>
+          }
+          endMessage={
+            <div className="text-center py-8 text-muted-foreground">
+              <p>You've seen all posts!</p>
+            </div>
+          }
+        >
+          <div className="">
+            {posts.map((post) => (
+              <PostCard key={post.id} post={post} onDelete={handlePostDelete} />
+            ))}
+          </div>
+        </InfiniteScroll>
+      </div>
     </>
 
 
@@ -145,7 +145,7 @@ function PostSkeleton() {
 
 function StoryAvatar({ src }: { src?: string }) {
   return (
-    <div className="w-12 h-12 p-[2px] rounded-full bg-gradient-to-tr from-[#feda75] via-[#d62976] to-[#962fbf]">
+    <div className="w-[50px] h-[50px] p-[2px] rounded-full bg-gradient-to-tr from-[#feda75] via-[#d62976] to-[#962fbf]">
       <div className="bg-white rounded-full w-full h-full overflow-hidden shadow-sm">
         {src ? (
           <img src={src} alt="story" className="w-full h-full object-cover" />

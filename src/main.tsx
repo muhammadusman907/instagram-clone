@@ -12,14 +12,8 @@ const queryClient = new QueryClient()
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <SidebarProvider>
-            <AppSidebar />
-            <SidebarTrigger />
-            <SidebarInset>
+        <BrowserRouter>     
               <App />
-            </SidebarInset>
-          </SidebarProvider>
         </BrowserRouter>
       </QueryClientProvider>
   </React.StrictMode>,

@@ -2,6 +2,8 @@ import { useEffect } from 'react'
 import { Navigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/store/authStore'
+import { SidebarInset, SidebarProvider, SidebarTrigger } from './ui/sidebar'
+import { AppSidebar } from './ui/app-sidebar'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
@@ -16,7 +18,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
       setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
-      
+
       if (session?.user) {
         fetchProfile(session.user.id)
       }
@@ -28,7 +30,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
       setUser(session?.user ?? null)
-      
+
       if (session?.user) {
         fetchProfile(session.user.id)
       }
@@ -52,6 +54,14 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <Navigate to="/login" replace />
   }
 
-  return <>{children}</>
+  return <>
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarTrigger />
+      <SidebarInset>
+        {children}
+      </SidebarInset>
+    </SidebarProvider>
+  </>
 }
 
